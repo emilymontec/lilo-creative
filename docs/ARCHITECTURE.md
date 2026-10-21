@@ -20,22 +20,22 @@ Referencias de producto:
                         ┌─────────────────┐
                         │   api-gateway    │  (JWT, rate limiting)
                         └────────┬─────────┘
-          ┌───────────┬──────────┼──────────┬───────────┬─────────────┐
-          │           │          │          │           │             │
-   ┌──────▼─────┐┌────▼─────┐┌───▼────┐┌────▼─────┐┌────▼────┐┌───────▼──────┐
-   │ generation ││design-tree││ export ││   auth   ││ billing ││ notification │
-   │  -service  ││ -service  ││-service││ -service ││-service ││   -service   │
-   └──────┬─────┘└────┬─────┘└───┬────┘└──────────┘└─────────┘└──────────────┘
-          │            │          │
-          │     ┌──────▼──────┐   │
-          │     │ PostgreSQL  │   │
-          │     │ (JSONB tree)│   │
-          │     └─────────────┘   │
-          │                       │
-   ┌──────▼─────┐          ┌──────▼──────┐
-   │ Claude/GPT-4│          │  Figma API  │
-   │  (LLM APIs) │          └─────────────┘
-   └─────────────┘
+     ┌───────────┬──────────┼──────────┬───────────┬─────────────┬──────────────┐
+     │           │          │          │           │             │              │
+┌────▼─────┐┌────▼─────┐┌───▼────┐┌────▼─────┐┌────▼────┐┌───────▼──────┐┌──────▼───────┐
+│generation ││design-tree││ export ││   auth   ││ billing ││ notification ││collaboration │
+│ -service  ││ -service  ││-service││ -service ││-service ││   -service   ││  -service    │
+└────┬─────┘└────┬─────┘└───┬────┘└──────────┘└─────────┘└──────────────┘└──────┬───────┘
+     │            │          │                                                   │
+     │     ┌──────▼──────┐   │                                           WebSockets
+     │     │ PostgreSQL  │   │                                          (Yjs/CRDT)
+     │     │ (JSONB tree)│◄──┼───────────────────────────────────────────────────┘
+     │     └─────────────┘   │
+     │                       │
+┌────▼─────┐          ┌──────▼──────┐
+│Claude/GPT-4│          │  Figma API  │
+│ (LLM APIs) │          └─────────────┘
+└─────────────┘
 
 Redis: caché + colas (BullMQ) · RabbitMQ/SQS: eventos async de generación
 S3/Cloud Storage: assets, thumbnails
@@ -49,8 +49,13 @@ S3/Cloud Storage: assets, thumbnails
 2. **Editar**: `editor-canvas` renderiza el árbol con Konva.js. Cada
    interacción (mover, redimensionar, cambiar estilo) actualiza el store
    (Zustand) y se persiste en `design-tree-service` (autosave + versionado).
-3. **Exportar**: `export-service` convierte el `DesignTree` a componentes
-   React + Tailwind, o lo envía a Figma vía su API REST.
+3. **Colaborar**: múltiples usuarios editan el mismo `DesignTree` a la vez.
+   `collaboration-service` sincroniza las operaciones vía Yjs/CRDT sobre
+   WebSockets, propaga presencia (cursores, selección) y persiste comentarios
+   anclados a elementos.
+4. **Exportar**: `export-service` convierte el `DesignTree` a componentes
+   React/Vue + Tailwind (incluyendo flujos multi-pantalla con su navegación),
+   o lo envía a Figma vía su API REST.
 
 ## Decisiones de arquitectura
 
@@ -60,9 +65,16 @@ S3/Cloud Storage: assets, thumbnails
   (usuarios, equipos, billing) y flexible donde se necesita (árbol de nodos).
 - **Microservicios** acotados por responsabilidad única, cada uno con su
   propio `package.json`, desplegable de forma independiente.
-- **Colaboración en tiempo real (CRDT/Yjs) es post-MVP**: se deja fuera de
-  las Fases 1-3 y se evalúa tras el lanzamiento según demanda real de
-  usuarios beta (ver `ROADMAP.md`, Fase 3 y riesgo de alcance en sección 10).
+- **Colaboración en tiempo real (CRDT/Yjs) es parte del producto final**, no
+  una fase condicional a demanda post-lanzamiento: se construye en la Fase 3
+  del roadmap, apoyada en un spike técnico dedicado en Fase 0 que valida que
+  el esquema de `design-schema` es mergeable con Yjs sin pérdida de datos
+  (ver `ROADMAP.md`, Fase 0 "Spike B" y Fase 3).
+- **El esquema de diseño (`design-schema`) se diseña completo desde la Fase 0**:
+  incluye componentes con variantes, design tokens y soporte multi-pantalla
+  desde el primer borrador, precisamente para no tener que rediseñarlo a
+  mitad de proyecto cuando se construya colaboración en tiempo real (Fase 3)
+  o exportación multi-framework (Fase 4).
 
 ## Escalado
 
@@ -72,5 +84,8 @@ S3/Cloud Storage: assets, thumbnails
 - `design-tree-service` es el más sensible a consistencia: autosave +
   snapshots deben ser atómicos y versionados.
 - El canvas (`editor-canvas`) debe optimizar renderizado para diseños
-  grandes (100+ elementos) — virtualización / culling si es necesario
-  (evaluado con datos reales en Fase 4, Beta).
+  grandes (100+ elementos) **con colaboración activa** — virtualización /
+  culling si es necesario (evaluado con datos reales en Fase 7, Beta cerrada).
+- `collaboration-service` es el más sensible a conexiones persistentes:
+  dimensionar WebSockets y la estrategia de reconexión desde el Spike B de
+  Fase 0, antes de que el resto del sistema dependa de su disponibilidad.

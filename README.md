@@ -30,7 +30,7 @@ lilo-creative/
 │   ├── design-tree-service/    # CRUD del árbol, versionado, autosave
 │   ├── export-service/         # JSON -> React/HTML/CSS, JSON -> Figma API
 │   ├── auth-service/           # Usuarios, sesiones, permisos, equipos
-│   ├── collaboration-service/  # WebSockets + CRDT (Yjs) — fase posterior
+│   ├── collaboration-service/  # WebSockets + CRDT (Yjs), presencia, comentarios
 │   ├── billing-service/        # Planes, límites de uso, pagos (Stripe)
 │   └── notification-service/   # Emails, in-app notifications
 ├── gateway/

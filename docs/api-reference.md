@@ -45,7 +45,7 @@
 | POST | `/billing/webhook` | Webhook de eventos de Stripe |
 | GET | `/billing/usage` | Uso actual vs límite del plan |
 
-## Collaboration Service (post-MVP)
+## Collaboration Service
 
 | Método | Ruta | Descripción |
 |---|---|---|

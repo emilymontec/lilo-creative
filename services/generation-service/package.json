@@ -1,0 +1,29 @@
+{
+  "name": "@lilo/generation-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Orquesta prompt -> LLM -> JSON del árbol de diseño. Prompt engineering, function calling/structured outputs, validación de esquema y cola de reintentos.",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "fastify": "latest",
+    "bullmq": "latest",
+    "ioredis": "latest",
+    "zod": "latest",
+    "@anthropic-ai/sdk": "latest",
+    "openai": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "tsx": "^4.19.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.7.0"
+  }
+}

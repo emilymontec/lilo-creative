@@ -1,0 +1,26 @@
+{
+  "name": "@lilo/notification-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Emails transaccionales y notificaciones in-app (ej. comentarios nuevos, bienvenida, límites de uso alcanzados).",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "fastify": "latest",
+    "nodemailer": "latest",
+    "bullmq": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "tsx": "^4.19.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.7.0"
+  }
+}

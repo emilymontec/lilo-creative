@@ -1,0 +1,27 @@
+{
+  "name": "@lilo/api-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Enrutamiento hacia los microservicios, rate limiting y middleware de autenticación compartido.",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "fastify": "latest",
+    "@fastify/http-proxy": "latest",
+    "@fastify/rate-limit": "latest",
+    "jsonwebtoken": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "tsx": "^4.19.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.7.0"
+  }
+}

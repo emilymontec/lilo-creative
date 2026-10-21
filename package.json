@@ -1,0 +1,24 @@
+{
+  "name": "lilo-creative",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plataforma de generación de diseños UI/UX editables por IA",
+  "workspaces": [
+    "frontend/*",
+    "services/*",
+    "gateway/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.1.0",
+    "typescript": "^5.6.0"
+  },
+  "packageManager": "npm@10.8.0"
+}

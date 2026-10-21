@@ -1,0 +1,35 @@
+# Ejemplo de manifiesto base — replicar por servicio en Fase 4/5
+# (preparación de infraestructura para escalar más allá de 50 usuarios concurrentes).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: generation-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: generation-service
+  template:
+    metadata:
+      labels:
+        app: generation-service
+    spec:
+      containers:
+        - name: generation-service
+          image: lilo/generation-service:latest
+          ports:
+            - containerPort: 4001
+          envFrom:
+            - secretRef:
+                name: lilo-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: generation-service
+spec:
+  selector:
+    app: generation-service
+  ports:
+    - port: 4001
+      targetPort: 4001

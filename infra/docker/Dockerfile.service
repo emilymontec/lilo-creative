@@ -1,0 +1,18 @@
+# Dockerfile genérico para servicios Node.js (generation, design-tree, export,
+# auth, billing, notification, api-gateway). Build con --build-arg SERVICE_PATH.
+FROM node:20-alpine AS build
+ARG SERVICE_PATH
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY packages ./packages
+COPY ${SERVICE_PATH} ./service
+WORKDIR /app/service
+RUN npm install && npm run build
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /app/service/dist ./dist
+COPY --from=build /app/service/package.json ./package.json
+RUN npm install --omit=dev
+EXPOSE 4000
+CMD ["node", "dist/index.js"]

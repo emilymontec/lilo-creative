@@ -15,7 +15,8 @@
   "dependencies": {
     "fastify": "latest",
     "pg": "latest",
-    "zod": "latest"
+    "zod": "latest",
+    "@lilo/design-schema": "*"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

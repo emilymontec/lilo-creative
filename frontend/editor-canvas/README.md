@@ -36,10 +36,33 @@ sincronización CRDT de la Fase 3 del roadmap.
 - `hooks/useKeyboardShortcuts.ts` — Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl/Cmd+D
   (duplicar), Supr (eliminar), flechas (mover 1px, Shift+flecha 10px)
 
-Pendiente para cerrar la Fase 2 por completo: multi-selección en el canvas
-(hoy `groupNodes` ya acepta varios ids, pero la UI para seleccionar varios
-nodos a la vez en el `Stage` de Konva todavía no está conectada) y el
-mapeo real de `DesignNode` -> primitivas Konva en `CanvasRenderer`.
+Fase 2 cerrada: `CanvasRenderer` ya mapea los 8 tipos de nodo a primitivas de
+Konva (incluida resolución de instancias de componente contra su maestro +
+variante), con drag para mover, selección simple y múltiple (Shift+click,
+tanto en el canvas como en `LayersPanel`) y modo preview (los botones con
+`onPress` navegan en vez de seleccionar). Pendiente real: handles de resize
+(hoy el tamaño se edita desde `PropertiesPanel`) y auto-layout completo para
+`stack` (el actual es una fila/columna simple, ver comentario en
+`CanvasRenderer.tsx`).
+
+## Fase 3: colaboración en tiempo real
+
+- `hooks/useCollaboration.ts` — conecta a la sala de `collaboration-service`
+  vía `y-websocket`, hidrata el store con el documento compartido y empuja
+  los cambios locales de vuelta
+- `components/PresenceBar.tsx` — avatares de los clientes conectados (Yjs Awareness)
+- `components/CommentsPanel.tsx` — comentarios anclados al nodo seleccionado
+
+**Limitación conocida, documentada también en el propio hook:** el merge
+granular por nodo que ofrece el `Y.Doc` del servidor no se aprovecha del
+todo todavía en el cliente — `useCollaboration` empuja el `root` completo de
+la pantalla activa en cada cambio local, así que el merge real hoy es por
+pantalla, no por nodo individual. Dos personas editando pantallas distintas
+nunca chocan; dos personas editando la misma pantalla a la vez sí pueden
+pisarse esa pantalla completa. Cerrar esa brecha es el siguiente paso de
+Fase 3: hacer que las mutaciones de `designStore` escriban directamente
+sobre el `Y.Doc` (vía `syncNodeIntoYMap` de `@lilo/collab-schema`) en vez de
+sobre un árbol JS plano que se empuja entero.
 
 ## Desarrollo
 

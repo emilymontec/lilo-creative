@@ -1,0 +1,13 @@
+{
+  "name": "@lilo/collab-schema",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Puente entre DesignDocument (@lilo/design-schema) y un Y.Doc (Yjs/CRDT) — usado por collaboration-service (servidor) y editor-canvas (cliente) para que ambos hablen la misma estructura CRDT.",
+  "main": "src/index.ts",
+  "scripts": { "build": "tsc -p tsconfig.json", "typecheck": "tsc --noEmit" },
+  "dependencies": {
+    "yjs": "latest",
+    "@lilo/design-schema": "*"
+  },
+  "devDependencies": { "typescript": "^5.6.0" }
+}

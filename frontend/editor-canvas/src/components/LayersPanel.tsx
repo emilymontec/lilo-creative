@@ -14,22 +14,23 @@ import { useDesignStore } from "../store/designStore";
 export function LayersPanel() {
   const screen = useDesignStore((s) => s.currentScreen());
   const selectedNodeId = useDesignStore((s) => s.selectedNodeId);
+  const selectedNodeIds = useDesignStore((s) => s.selectedNodeIds);
   const selectNode = useDesignStore((s) => s.selectNode);
+  const toggleSelectNode = useDesignStore((s) => s.toggleSelectNode);
   const reorderNode = useDesignStore((s) => s.reorderNode);
   const toggleLock = useDesignStore((s) => s.toggleLock);
   const toggleHidden = useDesignStore((s) => s.toggleHidden);
-  const groupNodes = useDesignStore((s) => s.groupNodes);
   const ungroupNode = useDesignStore((s) => s.ungroupNode);
 
   if (!screen) return null;
 
   function renderNode(node: DesignNode, depth: number) {
-    const isSelected = node.id === selectedNodeId;
+    const isSelected = node.id === selectedNodeId || selectedNodeIds.includes(node.id);
     return (
       <div key={node.id}>
         <div
           style={{ paddingLeft: depth * 12, opacity: node.hidden ? 0.4 : 1, fontWeight: isSelected ? 700 : 400 }}
-          onClick={() => selectNode(node.id)}
+          onClick={(e) => (e.shiftKey ? toggleSelectNode(node.id, true) : selectNode(node.id))}
         >
           <span>{node.name ?? node.type}</span>
           <button onClick={(e) => { e.stopPropagation(); toggleHidden(node.id); }} aria-label="Ocultar/mostrar">
@@ -53,8 +54,8 @@ export function LayersPanel() {
     <aside>
       <h3>Capas</h3>
       {renderNode(screen.root, 0)}
-      {/* Agrupar: selección múltiple de capas queda pendiente de UI de multi-selección en el canvas;
-          mientras tanto se puede invocar groupNodes([...ids]) desde ahí una vez implementada. */}
+      {/* Shift+click aquí o en el canvas agrega a la selección múltiple;
+          el botón "Agrupar" aparece en la Toolbar cuando hay 2+ nodos seleccionados. */}
     </aside>
   );
 }

@@ -19,7 +19,11 @@
     "zustand": "^5.0.0",
     "@lilo/design-schema": "*",
     "@lilo/sdk-client": "*",
-    "@lilo/shared-ui": "*"
+    "@lilo/shared-ui": "*",
+    "yjs": "latest",
+    "y-websocket": "latest",
+    "@lilo/collab-schema": "*",
+    "y-protocols": "latest"
   },
   "devDependencies": {
     "@types/react": "^18.3.0",

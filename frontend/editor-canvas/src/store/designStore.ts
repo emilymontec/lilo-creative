@@ -24,10 +24,17 @@ interface DesignStoreState {
   document: DesignDocument | null;
   currentScreenId: string | null;
   selectedNodeId: string | null;
+  /** ids en la selección múltiple actual (incluye siempre a `selectedNodeId` cuando hay uno). */
+  selectedNodeIds: string[];
+  /** Modo preview: los clics en botones con `onPress` navegan entre pantallas en vez de seleccionar. */
+  previewMode: boolean;
 
   setDocument: (document: DesignDocument, resetHistory?: boolean) => void;
   goToScreen: (screenId: string) => void;
   selectNode: (id: string | null) => void;
+  toggleSelectNode: (id: string, additive: boolean) => void;
+  clearSelection: () => void;
+  togglePreviewMode: () => void;
   currentScreen: () => Screen | null;
 
   // --- edición de nodos (Fase 1-2) ---
@@ -79,14 +86,30 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
     document: null,
     currentScreenId: null,
     selectedNodeId: null,
+    selectedNodeIds: [],
+    previewMode: false,
 
     setDocument: (document, resetHistory = true) => {
       if (resetHistory) useHistoryStore.getState().clear();
-      set({ document, currentScreenId: document.screens[0]?.id ?? null, selectedNodeId: null });
+      set({ document, currentScreenId: document.screens[0]?.id ?? null, selectedNodeId: null, selectedNodeIds: [] });
     },
 
-    goToScreen: (screenId) => set({ currentScreenId: screenId, selectedNodeId: null }),
-    selectNode: (id) => set({ selectedNodeId: id }),
+    goToScreen: (screenId) => set({ currentScreenId: screenId, selectedNodeId: null, selectedNodeIds: [] }),
+
+    selectNode: (id) => set({ selectedNodeId: id, selectedNodeIds: id ? [id] : [] }),
+
+    toggleSelectNode: (id, additive) =>
+      set((state) => {
+        if (!additive) return { selectedNodeId: id, selectedNodeIds: [id] };
+        const already = state.selectedNodeIds.includes(id);
+        const next = already ? state.selectedNodeIds.filter((n) => n !== id) : [...state.selectedNodeIds, id];
+        return { selectedNodeIds: next, selectedNodeId: next[next.length - 1] ?? null };
+      }),
+
+    clearSelection: () => set({ selectedNodeId: null, selectedNodeIds: [] }),
+
+    togglePreviewMode: () => set((state) => ({ previewMode: !state.previewMode, selectedNodeId: null, selectedNodeIds: [] })),
+
     currentScreen: () => {
       const { document, currentScreenId } = get();
       return document?.screens.find((s) => s.id === currentScreenId) ?? null;
@@ -117,7 +140,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
       if (nodeIds.length < 2) return;
       const newGroupId = crypto.randomUUID();
       mutateScreenRoot((root) => tree.groupSiblings(root, nodeIds, newGroupId));
-      set({ selectedNodeId: newGroupId });
+      set({ selectedNodeId: newGroupId, selectedNodeIds: [newGroupId] });
     },
 
     ungroupNode: (groupId) => mutateScreenRoot((root) => tree.ungroup(root, groupId)),

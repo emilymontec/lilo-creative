@@ -19,6 +19,28 @@
 
 ---
 
+## Estado de implementación (este repositorio)
+
+A medida que este roadmap se va llevando a código en el monorepo, esta
+sección se actualiza para que quede claro qué fase tiene código real detrás
+y qué fase es todavía solo plan. No reemplaza las entregas/gates descritos
+en cada fase — un ítem puede estar "implementado" aquí y seguir sin cumplir
+su gate de decisión (ej. el Spike A/B de Fase 0 sigue siendo un ejercicio a
+correr con el LLM/infra reales, no algo que el código por sí solo resuelva).
+
+| Fase | Estado | Notas |
+|---|---|---|
+| 0 — Investigación y validación | No iniciada | Los spikes técnicos (A: generación, B: colaboración CRDT) siguen pendientes de ejecutarse contra infraestructura real |
+| 1 — Infraestructura y generación multi-pantalla | **Código base implementado** | `@lilo/design-schema` completo (nodos, tokens, componentes, `DesignDocument` multi-pantalla); `design-tree-service` (CRUD + esquema SQL); `generation-service` (prompt, validador con reintentos, cola BullMQ); `auth-service` (equipos); `editor-canvas` con navegación entre pantallas. Los adaptadores LLM (`ClaudeAdapter`/`OpenAiAdapter`) y las llamadas reales a Postgres son `TODO` explícitos — el *wiring* está, falta conectar las integraciones externas |
+| 2 — Editor avanzado y sistema de diseño | **Implementada** | Capas (reordenar, bloquear/ocultar, agrupar/desagrupar), componentes con variantes, design tokens, historial undo/redo, atajos de teclado, `CanvasRenderer` real con Konva (8 tipos de nodo, drag, selección múltiple, modo preview). Pendiente real: handles de resize y auto-layout completo de `stack` |
+| 3 — Colaboración en tiempo real | **Código base implementado** | `@lilo/collab-schema` (puente `DesignDocument` ↔ `Y.Doc`), `collaboration-service` (salas CRDT, protocolo WebSocket estándar de Yjs, Awareness/presencia, comentarios con menciones), `editor-canvas` (`useCollaboration`, `PresenceBar`, `CommentsPanel`). Limitación conocida y documentada en el código: el cliente sincroniza por pantalla completa, no por nodo individual — ver README de `editor-canvas` y de `collaboration-service` |
+| 4 — Exportación multi-framework e integración Figma | No iniciada | |
+| 5 — Cuentas, equipos y monetización | Parcial | Modelo de equipos y rutas de `auth-service` ya existen (de Fase 1); falta Stripe y `admin-dashboard` real |
+| 6 — Plantillas, plugins y API pública | No iniciada | |
+| 7 — Beta cerrada, hardening y lanzamiento | No iniciada | |
+
+---
+
 ## 1. Fase 0 — Investigación y validación
 **Duración: 5-7 semanas | Equipo: todos**
 

@@ -2,7 +2,7 @@
   "name": "@lilo/collaboration-service",
   "version": "0.1.0",
   "private": true,
-  "description": "[POST-MVP / Fase 3+] Edición simultánea multi-usuario (CRDT/Yjs) y comentarios anclados a elementos del diseño.",
+  "description": "Edición simultánea multi-usuario (CRDT/Yjs), presencia en vivo y comentarios anclados a elementos del diseño.",
   "main": "src/index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -15,7 +15,11 @@
   "dependencies": {
     "ws": "latest",
     "yjs": "latest",
-    "y-websocket": "latest"
+    "y-protocols": "latest",
+    "lib0": "latest",
+    "fastify": "latest",
+    "@lilo/design-schema": "*",
+    "@lilo/collab-schema": "*"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

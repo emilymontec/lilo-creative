@@ -2,6 +2,7 @@ export * from "./nodeTypes";
 export * from "./tokens";
 export * from "./components";
 export * from "./document";
+export * from "./resolve";
 
 import { DesignTree } from "./nodeTypes";
 import { DesignDocument, Screen, emptyDesignDocument } from "./document";

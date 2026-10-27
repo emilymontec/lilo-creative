@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body { font-family: Inter, sans-serif; font-size: 12px; padding: 12px; }
+      input { width: 100%; box-sizing: border-box; padding: 6px; margin-bottom: 8px; }
+      button { width: 100%; padding: 8px; background: #6E56CF; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+      #status { margin-top: 8px; color: #555; }
+    </style>
+  </head>
+  <body>
+    <label for="designId">ID del diseño (Lilo Creative)</label>
+    <input id="designId" placeholder="ej. 7f3c2d55-..." />
+    <button id="importBtn">Importar</button>
+    <div id="status"></div>
+
+    <script>
+      const importBtn = document.getElementById("importBtn");
+      const designIdInput = document.getElementById("designId");
+      const status = document.getElementById("status");
+
+      importBtn.onclick = () => {
+        const designId = designIdInput.value.trim();
+        if (!designId) return;
+        status.textContent = "Importando...";
+        parent.postMessage({ pluginMessage: { type: "import", designId } }, "*");
+      };
+
+      window.onmessage = (event) => {
+        const msg = event.data.pluginMessage;
+        if (!msg) return;
+        if (msg.type === "done") status.textContent = `Listo — ${msg.count} elementos creados.`;
+        if (msg.type === "error") status.textContent = `Error: ${msg.message}`;
+      };
+    </script>
+  </body>
+</html>

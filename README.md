@@ -28,7 +28,7 @@ lilo-creative/
 ├── services/
 │   ├── generation-service/     # prompt -> LLM -> JSON del árbol
 │   ├── design-tree-service/    # CRUD del árbol, versionado, autosave
-│   ├── export-service/         # JSON -> React/HTML/CSS, JSON -> Figma API
+│   ├── export-service/         # DesignDocument -> React/Vue+Tailwind, SVG/PNG, payload de importación a Figma
 │   ├── auth-service/           # Usuarios, sesiones, permisos, equipos
 │   ├── collaboration-service/  # WebSockets + CRDT (Yjs), presencia, comentarios
 │   ├── billing-service/        # Planes, límites de uso, pagos (Stripe)
@@ -36,9 +36,12 @@ lilo-creative/
 ├── gateway/
 │   └── api-gateway/         # Enrutamiento, rate limiting, auth middleware
 ├── packages/
-│   ├── design-schema/       # Esquema JSON del árbol (fuente de verdad)
+│   ├── design-schema/       # Esquema del árbol (fuente de verdad) + resolución de componentes/tokens
+│   ├── collab-schema/       # Puente DesignDocument <-> Y.Doc (CRDT), usado por collaboration-service y editor-canvas
 │   ├── sdk-client/          # Cliente TS para consumir la API
 │   └── validation-utils/
+├── tools/
+│   └── figma-plugin/        # Plugin de Figma (Plugin API) que crea los nodos reales — no es un servicio web, ver su README
 ├── infra/
 │   ├── docker/
 │   ├── k8s/

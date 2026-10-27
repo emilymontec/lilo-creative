@@ -1,0 +1,15 @@
+{
+  "name": "@lilo/figma-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plugin de Figma que crea los nodos reales a partir del payload de importación de export-service — ver su README para por qué esto no puede ser un simple cliente REST.",
+  "scripts": {
+    "build": "esbuild src/code.ts --bundle --target=es2017 --outfile=dist/code.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "latest",
+    "esbuild": "latest",
+    "typescript": "^5.6.0"
+  }
+}

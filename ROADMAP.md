@@ -34,7 +34,7 @@ correr con el LLM/infra reales, no algo que el código por sí solo resuelva).
 | 1 — Infraestructura y generación multi-pantalla | **Código base implementado** | `@lilo/design-schema` completo (nodos, tokens, componentes, `DesignDocument` multi-pantalla); `design-tree-service` (CRUD + esquema SQL); `generation-service` (prompt, validador con reintentos, cola BullMQ); `auth-service` (equipos); `editor-canvas` con navegación entre pantallas. Los adaptadores LLM (`ClaudeAdapter`/`OpenAiAdapter`) y las llamadas reales a Postgres son `TODO` explícitos — el *wiring* está, falta conectar las integraciones externas |
 | 2 — Editor avanzado y sistema de diseño | **Implementada** | Capas (reordenar, bloquear/ocultar, agrupar/desagrupar), componentes con variantes, design tokens, historial undo/redo, atajos de teclado, `CanvasRenderer` real con Konva (8 tipos de nodo, drag, selección múltiple, modo preview). Pendiente real: handles de resize y auto-layout completo de `stack` |
 | 3 — Colaboración en tiempo real | **Código base implementado** | `@lilo/collab-schema` (puente `DesignDocument` ↔ `Y.Doc`), `collaboration-service` (salas CRDT, protocolo WebSocket estándar de Yjs, Awareness/presencia, comentarios con menciones), `editor-canvas` (`useCollaboration`, `PresenceBar`, `CommentsPanel`). Limitación conocida y documentada en el código: el cliente sincroniza por pantalla completa, no por nodo individual — ver README de `editor-canvas` y de `collaboration-service` |
-| 4 — Exportación multi-framework e integración Figma | No iniciada | |
+| 4 — Exportación multi-framework e integración Figma | **Código base implementado** | `export-service` (generadores React y Vue + Tailwind + router multi-pantalla, SVG real + rasterizado PNG con `sharp`, payload de importación a Figma) y `tools/figma-plugin/` (plugin real con Plugin API — ver corrección técnica en la sección de esta fase sobre qué puede y no puede hacer la REST API de Figma). Empaquetado a `.zip` de la descarga de código queda `TODO` |
 | 5 — Cuentas, equipos y monetización | Parcial | Modelo de equipos y rutas de `auth-service` ya existen (de Fase 1); falta Stripe y `admin-dashboard` real |
 | 6 — Plantillas, plugins y API pública | No iniciada | |
 | 7 — Beta cerrada, hardening y lanzamiento | No iniciada | |
@@ -153,8 +153,16 @@ A diferencia de un roadmap MVP, esta fase **no es condicional a demanda post-lan
 - Preview del código generado antes de descargar
 
 ### Semanas 4-6: Integración con Figma
-- Uso de la API REST de Figma para crear nodos programáticamente desde el JSON, incluyendo componentes con variantes y estilos (tokens → Figma styles)
-- Botón "Enviar a Figma" dentro del editor, con sincronización de múltiples pantallas como frames separados
+> **Corrección técnica respecto a la redacción original de esta sección:**
+> la API REST pública de Figma es de solo lectura — no permite crear ni
+> editar nodos de un archivo. Crear contenido en Figma únicamente es
+> posible desde la **Plugin API**, que corre dentro de Figma, no desde un
+> servidor externo. Ver `services/export-service/README.md` y
+> `tools/figma-plugin/README.md` para el detalle de la arquitectura real
+> implementada (payload de importación + plugin de Figma con Plugin API).
+- `export-service` resuelve el `DesignDocument` (componentes, variantes, tokens) a un payload plano de comandos de creación con posiciones absolutas
+- `tools/figma-plugin/` — plugin de Figma que pide ese payload y crea los nodos reales con `figma.createFrame()`/`createText()`/etc. vía la Plugin API, agrupando cada pantalla en su propio frame
+- Botón "Enviar a Figma" dentro del editor, que prepara el payload y (opcionalmente) comenta en el archivo de Figma destino vía la parte de la REST API que sí existe (comentarios)
 
 ### Semanas 7-8: Exportación de assets
 - Exportación como imagen (PNG/SVG) por pantalla o del flujo completo

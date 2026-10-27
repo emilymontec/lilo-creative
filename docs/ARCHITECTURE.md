@@ -32,10 +32,13 @@ Referencias de producto:
      │     │ (JSONB tree)│◄──┼───────────────────────────────────────────────────┘
      │     └─────────────┘   │
      │                       │
-┌────▼─────┐          ┌──────▼──────┐
-│Claude/GPT-4│          │  Figma API  │
-│ (LLM APIs) │          └─────────────┘
-└─────────────┘
+┌────▼─────┐          ┌──────────────┐
+│Claude/GPT-4│          │ figma-payload │ (polled by)
+│ (LLM APIs) │          └──────┬───────┘
+└─────────────┘                 │
+                        ┌────────▼────────┐
+                        │ tools/figma-plugin│ (Plugin API, corre DENTRO de Figma)
+                        └───────────────────┘
 
 Redis: caché + colas (BullMQ) · RabbitMQ/SQS: eventos async de generación
 S3/Cloud Storage: assets, thumbnails
@@ -53,9 +56,14 @@ S3/Cloud Storage: assets, thumbnails
    `collaboration-service` sincroniza las operaciones vía Yjs/CRDT sobre
    WebSockets, propaga presencia (cursores, selección) y persiste comentarios
    anclados a elementos.
-4. **Exportar**: `export-service` convierte el `DesignTree` a componentes
+4. **Exportar**: `export-service` convierte el `DesignDocument` a componentes
    React/Vue + Tailwind (incluyendo flujos multi-pantalla con su navegación),
-   o lo envía a Figma vía su API REST.
+   a SVG/PNG real de cada pantalla, o a un payload de importación que
+   `tools/figma-plugin/` consume para crear los nodos reales en Figma.
+   **Nota:** la creación de nodos en Figma no se hace vía su API REST — esa
+   API es de solo lectura; solo la Plugin API (que corre dentro de Figma)
+   puede crear contenido. Ver `services/export-service/README.md` para el
+   detalle de por qué la arquitectura tiene esta forma en dos partes.
 
 ## Decisiones de arquitectura
 
